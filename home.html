@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home — ProjectOnline</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #255fff;
+      color: white;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header button {
+      background: white;
+      color: #255fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 24px;
+    }
+
+    h2.section {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .card p {
+      color: #555;
+    }
+
+    .card button {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #255fff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .list-all {
+      display: block;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #255fff;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ProjectOnline</h1>
+    <button id="logout">Logout</button>
+  </header>
+
+  <main>
+    <h2 class="section">Active Projects</h2>
+    <div class="projects" id="projects-container">
+      <!-- Project cards will be injected here -->
+    </div>
+    <a class="list-all" id="list-all">List all</a>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      orderBy,
+      onSnapshot,
+      doc,
+      updateDoc,
+      arrayUnion
+    } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1wJq-LogOp2gLEhIFoiJi-qUOcqO7nGo",
+      authDomain: "projectonline-912cb.firebaseapp.com",
+      projectId: "projectonline-912cb",
+      storageBucket: "projectonline-912cb.appspot.com",
+      messagingSenderId: "264829153268",
+      appId: "1:264829153268:web:687c6eb0ffcbc6b4e493a1",
+      measurementId: "G-C646V8MGQJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Redirect if not authenticated
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = 'signin.html';
+      } else {
+        loadProjects(user);
+      }
+    });
+
+    // Logout button
+    document.getElementById('logout').addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = 'signin.html';
+      });
+    });
+
+    // Load and display projects
+    function loadProjects(user) {
+      const container = document.getElementById('projects-container');
+      const q = query(collection(db, 'projects'), orderBy('timestamp', 'desc'));
+
+      onSnapshot(q, (snapshot) => {
+        container.innerHTML = '';
+        snapshot.forEach((docSnap) => {
+          const p = docSnap.data();
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h3>${p.title}</h3>
+            <p>${p.description || 'No description provided.'}</p>
+            <button class="join">Join</button>
+          `;
+          card.querySelector('.join').addEventListener('click', () => {
+            if (!user) return alert('Please sign in first.');
+            updateDoc(doc(db, 'projects', docSnap.id), {
+              members: arrayUnion(user.uid)
+            })
+              .then(() => alert(`You joined “${p.title}”`))
+              .catch(err => alert(err.message));
+          });
+          container.appendChild(card);
+        });
+      });
+    }
+
+    // "List all" link placeholder
+    document.getElementById('list-all').addEventListener('click', () => {
+      alert('Listing all projects soon...');
+    });
+  </script>
+</body>
+</html>
