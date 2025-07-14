@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register for Project — ProjectOnline</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #fafafa; margin: 0; display: flex; height: 100vh; align-items: center; justify-content: center; }
+    .card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 320px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 14px; margin-bottom: 4px; color: #333; }
+    .field input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    button { width: 100%; padding: 12px; background: #255fff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Project Registration</h2>
+    <form id="regForm">
+      <div class="field">
+        <label for="studentName">Your Name</label>
+        <input id="studentName" type="text" required />
+      </div>
+      <div class="field">
+        <label for="studentEmail">Your E‑mail</label>
+        <input id="studentEmail" type="email" required />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('regForm').addEventListener('submit', e => {
+      e.preventDefault();
+      // Here you could send data to your server or Firestore...
+      alert('You have joined the project!');
+      // Then redirect back to home:
+      window.location.href = 'home.html';
+    });
+  </script>
+</body>
+</html>
