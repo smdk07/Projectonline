@@ -166,13 +166,14 @@
             <button class="join">Join</button>
           `;
           card.querySelector('.join').addEventListener('click', () => {
-            if (!user) return alert('Please sign in first.');
-            updateDoc(doc(db, 'projects', docSnap.id), {
-              members: arrayUnion(user.uid)
-            })
-              .then(() => alert(`You joined “${p.title}”`))
-              .catch(err => alert(err.message));
-          });
+  if (!user) {
+    alert('Please sign in first.');
+    return window.location.href = 'signin.html';
+  }
+  // Redirect user to registration page with project ID in URL
+  window.location.href = `registration.html?project=${docSnap.id}`;
+});
+
           container.appendChild(card);
         });
       });
